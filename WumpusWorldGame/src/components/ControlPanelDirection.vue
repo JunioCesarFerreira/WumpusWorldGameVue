@@ -2,10 +2,10 @@
   <div class="control-panel">
     <div class="buttons-container">
       <div class="movement-buttons">
-        <button @click="move('up')">↑</button>
-        <button @click="move('left')">←</button>
-        <button @click="move('down')">↓</button>
-        <button @click="move('right')">→</button>
+        <button @click="move('up')" class="direction-button">↑</button>
+        <button @click="move('left')" class="direction-button">←</button>
+        <button @click="move('down')" class="direction-button">↓</button>
+        <button @click="move('right')" class="direction-button">→</button>
       </div>
     </div>
   </div>
@@ -18,19 +18,19 @@ import { Direction } from '../types/enums/Direction';
 export default defineComponent({
   methods: {
     move(direction: string) {
-      let output = Direction.Down
-      switch(direction){
-        case 'up': 
-          output = Direction.Up
+      let output = Direction.Down;
+      switch (direction) {
+        case 'up':
+          output = Direction.Up;
           break;
         case 'down':
-          output = Direction.Down
+          output = Direction.Down;
           break;
         case 'left':
-          output = Direction.Left
+          output = Direction.Left;
           break;
         case 'right':
-          output = Direction.Right
+          output = Direction.Right;
           break;
       }
       this.$emit('move', output);
@@ -41,7 +41,7 @@ export default defineComponent({
 
 <style>
 .control-panel {
-  margin-top: 20px;
+  margin-top: 10px;
   display: flex;
   justify-content: center;
 }
@@ -54,10 +54,8 @@ export default defineComponent({
 .movement-buttons {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
+  grid-template-rows: repeat(4, 1fr);
   gap: 10px;
-  justify-items: center;
-  align-items: center;
 }
 
 .movement-buttons button:nth-child(1) {
@@ -80,7 +78,14 @@ export default defineComponent({
   grid-row: 2 / 3;
 }
 
-button {
+.direction-button {
+  width: 50px; /* Defina uma largura fixa */
+  height: 50px; /* Defina uma altura fixa */
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 10px;
+  font-weight: bold; /* Torna o texto em negrito */
+  font-size: 20px; /* Ajusta o tamanho da fonte, se necessário */
 }
 </style>
