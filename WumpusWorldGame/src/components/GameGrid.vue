@@ -13,22 +13,30 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import player_down from '@/assets/images/player_down.png'
-import player_up from '@/assets/images/player_up.png'
-import player_left from '@/assets/images/player_left.png'
-import player_right from '@/assets/images/player_right.png'
-import wumpus from '@/assets/images/wumpus.png'
-import brown_block from '@/assets/images/brown_block.png'
+import player_down_img from '@/assets/images/player_down.png'
+import player_up_img from '@/assets/images/player_up.png'
+import player_left_img from '@/assets/images/player_left.png'
+import player_right_img from '@/assets/images/player_right.png'
+import wumpus_img from '@/assets/images/wumpus.png'
+import gold_img from '@/assets/images/gold.png'
+import black_block_img from '@/assets/images/black_block.png'
+import gray_block_img from '@/assets/images/gray_block.png'
+import brown_block_img from '@/assets/images/brown_block.png'
 import { Direction } from '@/types/enums/Direction'
+import { Game, Position, arePositionsEqual, isPositionInArray } from '@/types/Game';
 
 interface Cell {
-  id: [number, number];
+  id: Position;
 }
 
 export default defineComponent({
   props:{
     directionProps: {
       type: Number as () => Direction,
+      required: true
+    },
+    gameProps: {
+      type: Object as PropType<Game>,
       required: true
     }
   },
@@ -41,39 +49,57 @@ export default defineComponent({
         [{ id: [1, 1] }, { id: [2, 1] }, { id: [3, 1] }, { id: [4, 1] }],
       ] as Cell[][],
       direction: Direction.Down,
-      scopeCell: [1,1] as [number,number],
+      playerPosition: [1,1] as Position,
+      wumpusPosition: [2,2] as Position,
+      pitsPositions: [[1,4],[2,4],[3,4]] as Position[],
+      goldPosition: [4,4] as Position,
+      show: true as boolean
     };
   },
   methods: {
-    getImgForCell(id: [number, number]) {
-      if (id[0] === this.scopeCell[0] && id[1] === this.scopeCell[1]) {
+    getImgForCell(pos: Position) {
+      if (arePositionsEqual(pos, this.playerPosition)) {
         switch (this.direction) {
             case Direction.Up:
-                return player_up
+                return player_up_img
             case Direction.Down:
-                return player_down
+                return player_down_img
             case Direction.Left:
-                return player_left
+                return player_left_img
             case Direction.Right:
-                return player_right
+                return player_right_img
+        }
+      } else if (this.show) {
+        if (arePositionsEqual(pos, this.wumpusPosition)){
+          return wumpus_img;
+        } else if (arePositionsEqual(pos, this.goldPosition)){
+          return gold_img;
+        } else if (isPositionInArray(pos, this.pitsPositions)){
+          return black_block_img;
+        } else {
+          return gray_block_img; 
         }
       } else {
-        return brown_block;
+        return brown_block_img;
       }
     },
-    getWarningTextForCell(id: [number, number]) {
-      if (id[0] === 2 && id[1] === 2) {
-        return "breeze";
-      } else {
-        return "";
-      }
+    getWarningTextForCell(id: Position) {
+      return "";
     }
   },
   watch:{
     directionProps:{
-      handler(newVal){
-        console.log('watch directionProps:',newVal)
-        this.direction = newVal
+      handler(newValue){
+        console.log('watch directionProps:',newValue)
+        this.direction = newValue
+      }
+    },
+    gameProps:{
+      handler(newValue){
+        console.log('watch gameProps:',newValue)
+        this.wumpusPosition = newValue.WumpusPosition
+        this.pitsPosition = newValue.PitsPositions
+        this.goldPosition = newValue.GoldPosition
       }
     }
   }

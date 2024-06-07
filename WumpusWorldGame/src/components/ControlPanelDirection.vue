@@ -18,6 +18,7 @@ import { Direction } from '../types/enums/Direction';
 export default defineComponent({
   methods: {
     move(direction: string) {
+      console.log('button direction:', direction)
       let output = Direction.Down;
       switch (direction) {
         case 'up':
