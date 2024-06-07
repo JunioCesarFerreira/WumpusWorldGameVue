@@ -6,10 +6,9 @@
         <GameGrid :directionProps="direction" />
       </div>
       <div class="info-panel">
+        <ControlPanelDirection @move="move" />
         <InfoPanel />
-      </div>
-      <div class="control-info-section">
-        <ControlPanel @move="move" />
+        <ControlPanelActions />
       </div>
     </div>
   </div>
@@ -19,7 +18,8 @@
 import { defineComponent } from 'vue';
 import Header from './components/Header.vue';
 import GameGrid from './components/GameGrid.vue';
-import ControlPanel from './components/ControlPanel.vue';
+import ControlPanelDirection from './components/ControlPanelDirection.vue';
+import ControlPanelActions from './components/ControlPanelActions.vue';
 import InfoPanel from './components/InfoPanel.vue';
 import { Direction } from '@/types/enums/Direction';
 
@@ -28,8 +28,9 @@ export default defineComponent({
   components: {
     Header,
     GameGrid,
-    ControlPanel,
+    ControlPanelDirection,
     InfoPanel,
+    ControlPanelActions,
   },
   data() {
     return {
@@ -52,6 +53,10 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.info-panel {
+  display: flex;
+  flex-direction: row;
 }
 .game-container {
   display: flex;

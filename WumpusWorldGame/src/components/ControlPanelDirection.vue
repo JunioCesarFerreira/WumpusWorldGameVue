@@ -7,23 +7,18 @@
         <button @click="move('down')">↓</button>
         <button @click="move('right')">→</button>
       </div>
-      <div class="action-buttons">
-        <button @click="go">Go</button>
-        <button @click="get">Get</button>
-        <button @click="arrow">Arrow</button>
-      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { Direction } from '@/types/enums/Direction';
+import { Direction } from '../types/enums/Direction';
 
 export default defineComponent({
   methods: {
     move(direction: string) {
-      let output = Direction.None
+      let output = Direction.Down
       switch(direction){
         case 'up': 
           output = Direction.Up
@@ -39,18 +34,6 @@ export default defineComponent({
           break;
       }
       this.$emit('move', output);
-    },
-    go() {
-      // lógica para go
-      this.$emit('action', 'go');
-    },
-    get() {
-      // lógica para get
-      this.$emit('action', 'get');
-    },
-    arrow() {
-      // lógica para usar arrow
-      this.$emit('action', 'arrow');
     },
   },
 });
@@ -95,12 +78,6 @@ export default defineComponent({
 .movement-buttons button:nth-child(4) {
   grid-column: 3 / 4;
   grid-row: 2 / 3;
-}
-
-.action-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
 button {

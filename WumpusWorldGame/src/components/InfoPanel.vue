@@ -1,11 +1,15 @@
 <template>
   <div class="info-panel">
-    <div v-for="(row, rowIndex) in info" :key="rowIndex" class="row">
-      <div v-for="cell in row" :key="cell.id" class="info-cell">
-        <div>W={{ cell.w }}</div>
-        <div>P={{ cell.p }}</div>
-      </div>
-    </div>
+    <table>
+      <tbody>
+        <tr v-for="(row, rowIndex) in info" :key="rowIndex">
+          <td v-for="cell in row" :key="cell.id">
+            <div>W={{ cell.w }}</div>
+            <div>P={{ cell.p }}</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -26,18 +30,23 @@ export default {
 
 <style>
 .info-panel {
-  display: flex;
-  flex-direction: column;
+  margin: 20px;
+  overflow-x: auto;
 }
 
-.row {
-  display: flex;
+table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.info-cell {
-  flex: 1;
-  border: 1px solid #000;
-  min-width: 50px;
-  min-height: 50px;
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+th {
+  background-color: #f4f4f4;
+  font-weight: bold;
 }
 </style>
