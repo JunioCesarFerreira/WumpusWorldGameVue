@@ -3,11 +3,11 @@
     <Header />
     <div class="game-container">
       <div class="grid-section">
-        <GameGrid :directionProps="direction" />
+        <GameGrid :directionProps="direction" :gameProps="game" />
       </div>
       <div class="info-panel">
         <ControlPanelDirection @move="move" />
-        <InfoPanel />
+        <ProbabilitiesTable />
         <ControlPanelActions />
       </div>
     </div>
@@ -20,8 +20,9 @@ import Header from './components/Header.vue';
 import GameGrid from './components/GameGrid.vue';
 import ControlPanelDirection from './components/ControlPanelDirection.vue';
 import ControlPanelActions from './components/ControlPanelActions.vue';
-import InfoPanel from './components/InfoPanel.vue';
+import ProbabilitiesTable from './components/ProbabilitiesTable.vue';
 import { Direction } from '@/types/enums/Direction';
+import { Game, Position } from '@/types/Game';
 
 export default defineComponent({
   name: 'App',
@@ -29,12 +30,21 @@ export default defineComponent({
     Header,
     GameGrid,
     ControlPanelDirection,
-    InfoPanel,
+    ProbabilitiesTable,
     ControlPanelActions,
   },
   data() {
     return {
       direction: Direction.Up as Direction,
+      game: {
+        WumpusPosition: [2, 3] as Position,
+        PitsPositions: [
+          [1, 4],
+          [2, 1],
+          [4, 3]
+        ] as Position[],
+        GoldPosition: [4, 4] as Position,
+      } as Game
     };
   },
   methods: {
