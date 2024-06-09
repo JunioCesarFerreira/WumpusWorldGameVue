@@ -2,32 +2,14 @@
     <div class="control-panel">
       <div class="buttons-container">
         <div class="action-buttons">
-          <button @click="go">Go</button>
-          <button @click="get">Get</button>
-          <button @click="arrow">Arrow</button>
+          <button @click="$emit('go')">Go</button>
+          <button @click="$emit('get')">Get</button>
+          <button @click="$emit('arrow')">Arrow</button>
         </div>
       </div>
     </div>
   </template>
-  
-  <script lang="ts">
-  import { defineComponent } from 'vue';
-  
-  export default defineComponent({
-    methods: {
-      go() {
-        this.$emit('go');
-      },
-      get() {
-        this.$emit('get');
-      },
-      arrow() {
-        this.$emit('arrow');
-      },
-    },
-  });
-  </script>
-  
+    
   <style>
   .control-panel {
     margin-top: 20px;

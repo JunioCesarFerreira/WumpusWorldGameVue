@@ -1,13 +1,19 @@
 <template>
   <div class="home">
-    <Header />
+    <HeaderPanel 
+      @newGame="newGame"
+      @myGames="myGames"
+      @show="show" @hide="hide"
+      @play="play" @stop="stop"
+      @step="step"
+    />
     <div class="game-container">
       <div class="grid-section">
         <GameGrid 
           :directionProps="direction" 
           :gameProps="game" 
           :playerPositionProps="playerPosition"
-          :showProps="show"
+          :showProps="showStatus"
         />
       </div>
       <div class="info-panel">
@@ -25,7 +31,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Header from './components/Header.vue';
+import HeaderPanel from './components/HeaderPanel.vue';
 import GameGrid from './components/GameGrid.vue';
 import ControlPanelDirection from './components/ControlPanelDirection.vue';
 import ControlPanelActions from './components/ControlPanelActions.vue';
@@ -36,7 +42,7 @@ import { Game, Position } from '@/types/Game';
 export default defineComponent({
   name: 'App',
   components: {
-    Header,
+    HeaderPanel,
     GameGrid,
     ControlPanelDirection,
     ProbabilitiesTable,
@@ -56,7 +62,7 @@ export default defineComponent({
         ] as Position[],
         GoldPosition: [4, 4] as Position,
       } as Game,
-      show: false as Boolean,
+      showStatus: false as Boolean,
     };
   },
   methods: {
@@ -92,6 +98,27 @@ export default defineComponent({
 
     },
     arrow(){
+
+    },
+    newGame(){
+
+    },
+    myGames(){
+
+    },
+    show(){
+      this.showStatus = true;
+    },
+    hide(){
+      this.showStatus = false;
+    },
+    play(){
+
+    },
+    stop(){
+
+    },
+    step(){
 
     }
   },

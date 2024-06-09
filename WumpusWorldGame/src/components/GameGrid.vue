@@ -147,6 +147,7 @@ export default defineComponent({
 .cell {
   position: relative;
   display: flex;
+  background-color: #202020;
   justify-content: center;
   align-items: center;
 }
