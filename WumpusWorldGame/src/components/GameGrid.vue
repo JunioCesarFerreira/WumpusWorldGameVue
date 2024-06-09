@@ -19,12 +19,14 @@ import player_up_img from '@/assets/images/player_up.png'
 import player_left_img from '@/assets/images/player_left.png'
 import player_right_img from '@/assets/images/player_right.png'
 import wumpus_img from '@/assets/images/wumpus.png'
+import dead_wumpus_img from '@/assets/images/dead_wumpus.png'
 import gold_img from '@/assets/images/gold.png'
 import black_block_img from '@/assets/images/black_block.png'
 import transparent_block_img from '@/assets/images/transparent_block.png'
 import brown_block_img from '@/assets/images/brown_block.png'
 import { Direction } from '@/types/enums/Direction'
-import { Game, Position, arePositionsEqual, isPositionInArray, getAdjacentCells } from '@/types/Game';
+import { Game } from '@/types/Game';
+import { Position, arePositionsEqual, isPositionInArray, getAdjacentCells } from '@/types/Position'
 
 interface Cell {
   id: Position;
@@ -32,14 +34,6 @@ interface Cell {
 
 export default defineComponent({
   props: {
-    directionProps: {
-      type: Number as () => Direction,
-      required: true
-    },
-    playerPositionProps: {
-      type: Object as PropType<Position>,
-      required: true
-    },
     gameProps: {
       type: Object as PropType<Game>,
       required: true
@@ -58,21 +52,21 @@ export default defineComponent({
         [{ id: [1, 2] }, { id: [2, 2] }, { id: [3, 2] }, { id: [4, 2] }],
         [{ id: [1, 1] }, { id: [2, 1] }, { id: [3, 1] }, { id: [4, 1] }],
       ] as Cell[][],
-      direction: Direction.Down,
-      wumpusPosition: [2, 3] as Position,
-      pitsPositions: [[1, 4], [3, 1], [4, 3]] as Position[],
-      goldPosition: [4, 4] as Position,
       visitedCells: [[1, 1]] as Position[] // Lista para armazenar as células visitadas
     };
   },
   methods: {
     getImgForCell(pos: Position) {
-      if (this.showProps || isPositionInArray(pos, this.visitedCells)) {  
-        if (arePositionsEqual(pos, this.wumpusPosition)) {
-          return wumpus_img;
-        } else if (arePositionsEqual(pos, this.goldPosition)) {
+      if (this.showProps || isPositionInArray(pos, this.gameProps.visitedCells)) {  
+        if (arePositionsEqual(pos, this.gameProps.wumpusPosition)) {
+          if (this.gameProps.wumpusIsDead){
+            return dead_wumpus_img;
+          } else {
+            return wumpus_img;
+          }
+        } else if (arePositionsEqual(pos, this.gameProps.goldPosition) && !this.gameProps.player.gold) {
           return gold_img;
-        } else if (isPositionInArray(pos, this.pitsPositions)) {
+        } else if (isPositionInArray(pos, this.gameProps.pitsPositions)) {
           return black_block_img;
         } else {
           return transparent_block_img;
@@ -82,10 +76,10 @@ export default defineComponent({
       }
     },
     shouldOverlayPlayer(pos: Position) {
-      return arePositionsEqual(pos, this.playerPositionProps);
+      return arePositionsEqual(pos, this.gameProps.player.position);
     },
     getPlayerImg() {
-      switch (this.direction) {
+      switch (this.gameProps.player.direction) {
         case Direction.Up:
           return player_up_img;
         case Direction.Down:
@@ -100,9 +94,9 @@ export default defineComponent({
     },
     getWarningTextForCell(pos: Position): string {
       // Retorna indicadores de perigo quando célula é visitada ou está em modo de apresentação
-      if (isPositionInArray(pos, this.visitedCells) || this.showProps){
-        let stench = isPositionInArray(pos, getAdjacentCells([this.wumpusPosition], 4))
-        let breeze = isPositionInArray(pos, getAdjacentCells(this.pitsPositions, 4))
+      if (isPositionInArray(pos, this.gameProps.visitedCells) || this.showProps){
+        let stench = isPositionInArray(pos, getAdjacentCells([this.gameProps.wumpusPosition], 4))
+        let breeze = isPositionInArray(pos, getAdjacentCells(this.gameProps.pitsPositions, 4))
         if (stench && breeze){
           return "stench\nbreeze"
         }else if (stench){
@@ -115,27 +109,15 @@ export default defineComponent({
     }
   },
   watch: {
-    directionProps: {
-      handler(newValue: Direction) {
-        this.direction = newValue;
-      }
-    },
-    playerPositionProps: {
-      handler(newValue: Position) {
+    gameProps: {
+      handler(newValue: Game) {
         // Atualiza a lista de células visitadas quando a posição do jogador mudar
-        if (!isPositionInArray(newValue, this.visitedCells)) {
-          const pos = { ...newValue } as Position;
-          this.visitedCells.push(pos);
+        if (!isPositionInArray(newValue.player.position, this.gameProps.visitedCells)) {
+          const pos = { ...newValue.player.position } as Position;
+          this.gameProps.visitedCells.push(pos);
         }
       },
       deep: true
-    },
-    gameProps: {
-      handler(newValue: Game) {
-        this.wumpusPosition = newValue.WumpusPosition;
-        this.pitsPositions = newValue.PitsPositions;
-        this.goldPosition = newValue.GoldPosition;
-      }
     }
   }
 });

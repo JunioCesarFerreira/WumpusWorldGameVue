@@ -10,9 +10,7 @@
     <div class="game-container">
       <div class="grid-section">
         <GameGrid 
-          :directionProps="direction" 
           :gameProps="game" 
-          :playerPositionProps="playerPosition"
           :showProps="showStatus"
         />
       </div>
@@ -30,14 +28,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onBeforeUnmount } from 'vue';
+import { defineComponent } from 'vue';
 import HeaderPanel from './components/HeaderPanel.vue';
 import GameGrid from './components/GameGrid.vue';
 import ControlPanelDirection from './components/ControlPanelDirection.vue';
 import ControlPanelActions from './components/ControlPanelActions.vue';
 import ProbabilitiesTable from './components/ProbabilitiesTable.vue';
 import { Direction } from '@/types/enums/Direction';
-import { Game, Position } from '@/types/Game';
+import { Position } from './types/Position';
+import { Game } from '@/types/Game';
+import { GameHandler} from '@/types/classes/GameHandler'
 
 export default defineComponent({
   name: 'App',
@@ -51,44 +51,50 @@ export default defineComponent({
   data() {
     return {
       dimension: 4 as Number, // Dimensão do tabuleiro quadrado
-      direction: Direction.Down as Direction, // Direção inicial
-      playerPosition: [1,1] as Position, // Posição inicial
       game: {
-        WumpusPosition: [2, 3] as Position,
-        PitsPositions: [
+        wumpusPosition: [2, 3] as Position,
+        wumpusIsDead: false,
+        pitsPositions: [
           [1, 4],
-          [2, 1],
+          [3, 1],
           [4, 3]
         ] as Position[],
-        GoldPosition: [4, 4] as Position,
+        goldPosition: [4, 4] as Position,
+        player: {
+          position: [1,1] as Position,
+          direction: Direction.Down,
+          arrow: true
+        },
+        visitedCells: [] as Position[]
       } as Game,
       showStatus: false as Boolean,
+      gameHandler: null as GameHandler | null,
     };
   },
   methods: {
     move(direction: Direction) {
-      this.direction = direction;
+      this.game.player.direction = direction;
     },
     go() {
-      switch(this.direction){
+      switch(this.game.player.direction){
         case Direction.Up:
-          if (this.playerPosition[1] + 1 <= this.dimension) {
-            this.playerPosition[1]++;
+          if (this.game.player.position[1] + 1 <= this.dimension) {
+            this.game.player.position[1]++;
           }
           break;
         case Direction.Down:
-          if (this.playerPosition[1] - 1 > 0) {
-            this.playerPosition[1]--;
+          if (this.game.player.position[1] - 1 > 0) {
+            this.game.player.position[1]--;
           }
           break;
         case Direction.Left:
-          if (this.playerPosition[0] - 1 > 0) {
-            this.playerPosition[0]--;
+          if (this.game.player.position[0] - 1 > 0) {
+            this.game.player.position[0]--;
           }
           break;
         case Direction.Right:
-          if (this.playerPosition[0] + 1 <= this.dimension) {
-            this.playerPosition[0]++;
+          if (this.game.player.position[0] + 1 <= this.dimension) {
+            this.game.player.position[0]++;
           }
           break;
       }
@@ -110,18 +116,28 @@ export default defineComponent({
         case 'Enter':
           this.go();
           break;
-        case 'Space':
+        case ' ':
           this.get();
           break;
         case 'A':
+        case 'a':
           this.arrow();
           break;
       }
     },
-    get() {},
-    arrow() {},
-    newGame() {},
-    myGames() {},
+    get() {
+      console.log('get gold action')
+      this.gameHandler.getGold();
+    },
+    arrow() {
+      console.log('arrow shoot action')
+      this.gameHandler.playerShootsArrow();
+    },
+    newGame() {
+      this.gameHandler.newGame();
+    },
+    myGames() {
+    },
     show() {
       this.showStatus = true;
     },
@@ -134,6 +150,7 @@ export default defineComponent({
   },
   mounted() {
     window.addEventListener('keydown', this.handleKeydown);
+    this.gameHandler = new GameHandler(this.game);
   },
   beforeUnmount() {
     window.removeEventListener('keydown', this.handleKeydown);
