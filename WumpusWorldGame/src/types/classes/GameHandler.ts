@@ -42,7 +42,55 @@ export class GameHandler {
     this.game.player.gold = false;
     this.game.visitedCells = [[1,1]];
     this.game.wumpusIsDead = false;
+    this.game.score = 0;
     console.log(JSON.stringify(this.game))
+  }
+
+  updateScore(value: number) {
+    this.game.score += value;
+  }
+
+  
+  move(direction: Direction) {
+    this.game.player.direction = direction;
+  }
+
+  go(): string {
+    switch(this.game.player.direction){
+      case Direction.Up:
+        if (this.game.player.position[1] + 1 <= this.dimY) {
+          this.game.player.position[1]++;
+          this.updateScore(-1)
+        }
+        break;
+      case Direction.Down:
+        if (this.game.player.position[1] - 1 > 0) {
+          this.game.player.position[1]--;
+          this.updateScore(-1)
+        }
+        break;
+      case Direction.Left:
+        if (this.game.player.position[0] - 1 > 0) {
+          this.game.player.position[0]--;
+          this.updateScore(-1)
+        }
+        break;
+      case Direction.Right:
+        if (this.game.player.position[0] + 1 <= this.dimX) {
+          this.game.player.position[0]++;
+          this.updateScore(-1)
+        }
+        break;
+    }
+    if (this.isPit(this.game.player.position)) {
+      this.updateScore(-1000);
+      return "you fell into the pit and died!";
+    }
+    if (this.isWumpus(this.game.player.position) && !this.game.wumpusIsDead) {
+      this.updateScore(-1000);
+      return "you were devoured by the Wumpus!";
+    }
+    return "safe";
   }
 
   isWumpus(pos: Position): boolean {
@@ -56,6 +104,7 @@ export class GameHandler {
   getGold(): void{
     if (arePositionsEqual(this.game.player.position, this.game.goldPosition)) {
       this.game.player.gold = true;
+      this.updateScore(1000);
     }
   }
 
@@ -65,6 +114,7 @@ export class GameHandler {
     const [wumpusX, wumpusY] = this.game.wumpusPosition;
     if (this.game.player.arrow) {
       this.game.player.arrow = false;
+      this.updateScore(-10);
       switch (this.game.player.direction) {
         case Direction.Up:
           if (playerX === wumpusX && playerY + 1 === wumpusY) {

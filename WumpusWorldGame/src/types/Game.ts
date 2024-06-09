@@ -8,4 +8,5 @@ export interface Game {
   player: Player;
   visitedCells: Position[];
   wumpusIsDead: boolean;
+  score: number;
 }

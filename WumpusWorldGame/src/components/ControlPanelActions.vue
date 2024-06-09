@@ -5,6 +5,7 @@
           <button @click="$emit('go')">Go</button>
           <button @click="$emit('get')">Get</button>
           <button @click="$emit('arrow')">Arrow</button>
+          <label>screem</label>
         </div>
       </div>
     </div>

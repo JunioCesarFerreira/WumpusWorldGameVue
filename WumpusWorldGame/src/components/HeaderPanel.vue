@@ -11,9 +11,14 @@
 
 <script lang="ts">
 export default {
+  props:{
+    score:{
+      type: Number,
+      required: true
+    }
+  },
   data() {
     return {
-      score: 0,
       textShow: 'show',
       textPlay: 'play'
     };

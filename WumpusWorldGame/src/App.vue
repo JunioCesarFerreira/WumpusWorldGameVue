@@ -6,6 +6,7 @@
       @show="show" @hide="hide"
       @play="play" @stop="stop"
       @step="step"
+      :score="game.score"
     />
     <div class="game-container">
       <div class="grid-section">
@@ -52,6 +53,7 @@ export default defineComponent({
     return {
       dimension: 4 as Number, // Dimensão do tabuleiro quadrado
       game: {
+        score: 0,
         wumpusPosition: [2, 3] as Position,
         wumpusIsDead: false,
         pitsPositions: [
@@ -72,33 +74,6 @@ export default defineComponent({
     };
   },
   methods: {
-    move(direction: Direction) {
-      this.game.player.direction = direction;
-    },
-    go() {
-      switch(this.game.player.direction){
-        case Direction.Up:
-          if (this.game.player.position[1] + 1 <= this.dimension) {
-            this.game.player.position[1]++;
-          }
-          break;
-        case Direction.Down:
-          if (this.game.player.position[1] - 1 > 0) {
-            this.game.player.position[1]--;
-          }
-          break;
-        case Direction.Left:
-          if (this.game.player.position[0] - 1 > 0) {
-            this.game.player.position[0]--;
-          }
-          break;
-        case Direction.Right:
-          if (this.game.player.position[0] + 1 <= this.dimension) {
-            this.game.player.position[0]++;
-          }
-          break;
-      }
-    },
     handleKeydown(event: KeyboardEvent) {
       switch(event.key) {
         case 'ArrowUp':
@@ -124,6 +99,14 @@ export default defineComponent({
           this.arrow();
           break;
       }
+    },
+    move(direction: Direction){
+      console.log('move direction action')
+      this.gameHandler.move(direction);
+    },
+    go() {
+      console.log('move player action')
+      this.gameHandler.go();
     },
     get() {
       console.log('get gold action')
