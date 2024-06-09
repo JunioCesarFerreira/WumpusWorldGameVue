@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted, onBeforeUnmount } from 'vue';
 import HeaderPanel from './components/HeaderPanel.vue';
 import GameGrid from './components/GameGrid.vue';
 import ControlPanelDirection from './components/ControlPanelDirection.vue';
@@ -69,61 +69,74 @@ export default defineComponent({
     move(direction: Direction) {
       this.direction = direction;
     },
-    go(){
-      console.log("go", this.direction, this.playerPosition)
+    go() {
       switch(this.direction){
         case Direction.Up:
-          if (this.playerPosition[1]+1 <= this.dimension) {
+          if (this.playerPosition[1] + 1 <= this.dimension) {
             this.playerPosition[1]++;
           }
           break;
         case Direction.Down:
-          if (this.playerPosition[1]-1 > 0) {
+          if (this.playerPosition[1] - 1 > 0) {
             this.playerPosition[1]--;
           }
           break;
         case Direction.Left:
-          if (this.playerPosition[0]-1 > 0) {
+          if (this.playerPosition[0] - 1 > 0) {
             this.playerPosition[0]--;
           }
           break;
         case Direction.Right:
-          if (this.playerPosition[0]+1 <= this.dimension) {
+          if (this.playerPosition[0] + 1 <= this.dimension) {
             this.playerPosition[0]++;
           }
           break;
       }
     },
-    get(){
-
+    handleKeydown(event: KeyboardEvent) {
+      switch(event.key) {
+        case 'ArrowUp':
+          this.move(Direction.Up);
+          break;
+        case 'ArrowDown':
+          this.move(Direction.Down);
+          break;
+        case 'ArrowLeft':
+          this.move(Direction.Left);
+          break;
+        case 'ArrowRight':
+          this.move(Direction.Right);
+          break;
+        case 'Enter':
+          this.go();
+          break;
+        case 'Space':
+          this.get();
+          break;
+        case 'A':
+          this.arrow();
+          break;
+      }
     },
-    arrow(){
-
-    },
-    newGame(){
-
-    },
-    myGames(){
-
-    },
-    show(){
+    get() {},
+    arrow() {},
+    newGame() {},
+    myGames() {},
+    show() {
       this.showStatus = true;
     },
-    hide(){
+    hide() {
       this.showStatus = false;
     },
-    play(){
-
-    },
-    stop(){
-
-    },
-    step(){
-
-    }
+    play() {},
+    stop() {},
+    step() {}
   },
-  created() {
-    console.log('teste', this.direction);
+  mounted() {
+    window.addEventListener('keydown', this.handleKeydown);
+  },
+  beforeUnmount() {
+    window.removeEventListener('keydown', this.handleKeydown);
   },
 });
 </script>

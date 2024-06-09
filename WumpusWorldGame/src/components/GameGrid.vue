@@ -24,7 +24,7 @@ import black_block_img from '@/assets/images/black_block.png'
 import transparent_block_img from '@/assets/images/transparent_block.png'
 import brown_block_img from '@/assets/images/brown_block.png'
 import { Direction } from '@/types/enums/Direction'
-import { Game, Position, arePositionsEqual, isPositionInArray } from '@/types/Game';
+import { Game, Position, arePositionsEqual, isPositionInArray, getAdjacentCells } from '@/types/Game';
 
 interface Cell {
   id: Position;
@@ -98,32 +98,40 @@ export default defineComponent({
           return player_down_img;
       }
     },
-    getWarningTextForCell(id: Position) {
-      return "";
+    getWarningTextForCell(pos: Position): string {
+      // Retorna indicadores de perigo quando célula é visitada ou está em modo de apresentação
+      if (isPositionInArray(pos, this.visitedCells) || this.showProps){
+        let stench = isPositionInArray(pos, getAdjacentCells([this.wumpusPosition], 4))
+        let breeze = isPositionInArray(pos, getAdjacentCells(this.pitsPositions, 4))
+        if (stench && breeze){
+          return "stench\nbreeze"
+        }else if (stench){
+          return "stench"
+        }else if (breeze){
+          return "breeze"
+        }
+      }
+      return ""
     }
   },
   watch: {
     directionProps: {
       handler(newValue: Direction) {
-        console.log('watch directionProps:', newValue);
         this.direction = newValue;
       }
     },
     playerPositionProps: {
       handler(newValue: Position) {
-        console.log("watch playerPositionProps visitedCells", this.visitedCells);
         // Atualiza a lista de células visitadas quando a posição do jogador mudar
         if (!isPositionInArray(newValue, this.visitedCells)) {
           const pos = { ...newValue } as Position;
           this.visitedCells.push(pos);
         }
-        console.log("watch playerPositionProps visitedCells", this.visitedCells);
       },
       deep: true
     },
     gameProps: {
       handler(newValue: Game) {
-        console.log('watch gameProps:', newValue);
         this.wumpusPosition = newValue.WumpusPosition;
         this.pitsPositions = newValue.PitsPositions;
         this.goldPosition = newValue.GoldPosition;
@@ -174,7 +182,7 @@ export default defineComponent({
   position: absolute;
   color: white;
   font-size: 16px;
-  font-weight: bold;
+  text-align: center;
   text-shadow: 1px 1px 2px black;
   z-index: 3;
 }
