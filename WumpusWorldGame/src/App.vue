@@ -3,12 +3,21 @@
     <Header />
     <div class="game-container">
       <div class="grid-section">
-        <GameGrid :directionProps="direction" :gameProps="game" />
+        <GameGrid 
+          :directionProps="direction" 
+          :gameProps="game" 
+          :playerPositionProps="playerPosition"
+          :showProps="show"
+        />
       </div>
       <div class="info-panel">
         <ControlPanelDirection @move="move" />
         <ProbabilitiesTable />
-        <ControlPanelActions />
+        <ControlPanelActions 
+          @go="go" 
+          @get="get" 
+          @arrow="arrow"
+        />
       </div>
     </div>
   </div>
@@ -35,7 +44,9 @@ export default defineComponent({
   },
   data() {
     return {
-      direction: Direction.Up as Direction,
+      dimension: 4 as Number, // Dimensão do tabuleiro quadrado
+      direction: Direction.Down as Direction, // Direção inicial
+      playerPosition: [1,1] as Position, // Posição inicial
       game: {
         WumpusPosition: [2, 3] as Position,
         PitsPositions: [
@@ -44,13 +55,45 @@ export default defineComponent({
           [4, 3]
         ] as Position[],
         GoldPosition: [4, 4] as Position,
-      } as Game
+      } as Game,
+      show: false as Boolean,
     };
   },
   methods: {
     move(direction: Direction) {
       this.direction = direction;
     },
+    go(){
+      console.log("go", this.direction, this.playerPosition)
+      switch(this.direction){
+        case Direction.Up:
+          if (this.playerPosition[1]+1 <= this.dimension) {
+            this.playerPosition[1]++;
+          }
+          break;
+        case Direction.Down:
+          if (this.playerPosition[1]-1 > 0) {
+            this.playerPosition[1]--;
+          }
+          break;
+        case Direction.Left:
+          if (this.playerPosition[0]-1 > 0) {
+            this.playerPosition[0]--;
+          }
+          break;
+        case Direction.Right:
+          if (this.playerPosition[0]+1 <= this.dimension) {
+            this.playerPosition[0]++;
+          }
+          break;
+      }
+    },
+    get(){
+
+    },
+    arrow(){
+
+    }
   },
   created() {
     console.log('teste', this.direction);

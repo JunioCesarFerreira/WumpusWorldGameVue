@@ -16,16 +16,13 @@
   export default defineComponent({
     methods: {
       go() {
-        // lógica para go
-        this.$emit('action', 'go');
+        this.$emit('go');
       },
       get() {
-        // lógica para get
-        this.$emit('action', 'get');
+        this.$emit('get');
       },
       arrow() {
-        // lógica para usar arrow
-        this.$emit('action', 'arrow');
+        this.$emit('arrow');
       },
     },
   });

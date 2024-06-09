@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import player_down_img from '@/assets/images/player_down.png'
 import player_up_img from '@/assets/images/player_up.png'
 import player_left_img from '@/assets/images/player_left.png'
@@ -20,7 +20,7 @@ import player_right_img from '@/assets/images/player_right.png'
 import wumpus_img from '@/assets/images/wumpus.png'
 import gold_img from '@/assets/images/gold.png'
 import black_block_img from '@/assets/images/black_block.png'
-import gray_block_img from '@/assets/images/gray_block.png'
+import transparent_block_img from '@/assets/images/transparent_block.png'
 import brown_block_img from '@/assets/images/brown_block.png'
 import { Direction } from '@/types/enums/Direction'
 import { Game, Position, arePositionsEqual, isPositionInArray } from '@/types/Game';
@@ -35,9 +35,18 @@ export default defineComponent({
       type: Number as () => Direction,
       required: true
     },
+    playerPositionProps:{
+      type: Object as PropType<Position>,
+      required: true
+    },
     gameProps: {
       type: Object as PropType<Game>,
       required: true
+    },
+    showProps: {
+      type: Boolean,
+      default: false,
+      required: true,
     }
   },
   data() {
@@ -49,16 +58,15 @@ export default defineComponent({
         [{ id: [1, 1] }, { id: [2, 1] }, { id: [3, 1] }, { id: [4, 1] }],
       ] as Cell[][],
       direction: Direction.Down,
-      playerPosition: [1,1] as Position,
-      wumpusPosition: [2,2] as Position,
-      pitsPositions: [[1,4],[2,4],[3,4]] as Position[],
+      wumpusPosition: [2,3] as Position,
+      pitsPositions: [[1,4],[3,1],[4,3]] as Position[],
       goldPosition: [4,4] as Position,
-      show: true as boolean
+      visitedCells: [[1,1]] as Position[] // Lista para armazenar as células visitadas
     };
   },
   methods: {
     getImgForCell(pos: Position) {
-      if (arePositionsEqual(pos, this.playerPosition)) {
+      if (arePositionsEqual(pos, this.playerPositionProps)) {
         switch (this.direction) {
             case Direction.Up:
                 return player_up_img
@@ -69,7 +77,7 @@ export default defineComponent({
             case Direction.Right:
                 return player_right_img
         }
-      } else if (this.show) {
+      } else if (this.showProps) {
         if (arePositionsEqual(pos, this.wumpusPosition)){
           return wumpus_img;
         } else if (arePositionsEqual(pos, this.goldPosition)){
@@ -77,10 +85,14 @@ export default defineComponent({
         } else if (isPositionInArray(pos, this.pitsPositions)){
           return black_block_img;
         } else {
-          return gray_block_img; 
+          return transparent_block_img; 
         }
       } else {
-        return brown_block_img;
+        if (isPositionInArray(pos, this.visitedCells)){
+          return transparent_block_img;
+        }else {
+          return brown_block_img;
+        }
       }
     },
     getWarningTextForCell(id: Position) {
@@ -89,13 +101,25 @@ export default defineComponent({
   },
   watch:{
     directionProps:{
-      handler(newValue){
-        console.log('watch directionProps:',newValue)
+      handler(newValue: Direction){
+        console.log('watch directionProps:', newValue)
         this.direction = newValue
       }
     },
+    playerPositionProps:{
+      handler(newValue: Position){
+        console.log("watch playerPositionProps visitedCells", this.visitedCells)
+        // Atualiza a lista de células visitadas quando a posição do jogador mudar
+        if (!isPositionInArray(newValue, this.visitedCells)) {
+          const pos = {...newValue} as Position;
+          this.visitedCells.push(pos);
+        }
+        console.log("watch playerPositionProps visitedCells", this.visitedCells)
+      },
+      deep: true
+    },
     gameProps:{
-      handler(newValue){
+      handler(newValue: Game){
         console.log('watch gameProps:',newValue)
         this.wumpusPosition = newValue.WumpusPosition
         this.pitsPosition = newValue.PitsPositions
@@ -116,7 +140,7 @@ export default defineComponent({
 }
 .col {
   flex: 1;
-  border: 1px solid #000;
+  border: 1px solid #8b8b8b;
   min-width: 50px;
   min-height: 50px;
 }
