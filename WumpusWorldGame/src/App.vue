@@ -14,6 +14,7 @@
           :gameProps="game" 
           :showProps="showStatus"
         />
+        <label v-show="alertMessage.visible" class="label-alert">{{ alertMessage.text }}</label>
       </div>
       <div class="info-panel">
         <ControlPanelDirection @move="move" />
@@ -40,6 +41,11 @@ import { Direction } from '@/types/enums/Direction';
 import { Position } from './types/Position';
 import { Game } from '@/types/Game';
 import { GameHandler} from '@/types/classes/GameHandler'
+
+interface AlertMessage{
+  visible: boolean,
+  text: string
+}
 
 export default defineComponent({
   name: 'App',
@@ -72,62 +78,69 @@ export default defineComponent({
       } as Game,
       showStatus: false as Boolean,
       gameHandler: null as GameHandler | null,
+      alertMessage: { visible: false, text: "" } as AlertMessage
     };
   },
   methods: {
     handleKeydown(event: KeyboardEvent) {
       switch(event.key) {
         case 'ArrowUp':
-          this.move(Direction.Up);
+          this.move(Direction.Up)
           break;
         case 'ArrowDown':
-          this.move(Direction.Down);
+          this.move(Direction.Down)
           break;
         case 'ArrowLeft':
-          this.move(Direction.Left);
+          this.move(Direction.Left)
           break;
         case 'ArrowRight':
-          this.move(Direction.Right);
+          this.move(Direction.Right)
           break;
         case 'Enter':
-          this.go();
+          this.go()
           break;
         case ' ':
-          this.get();
+          this.get()
           break;
         case 'A':
         case 'a':
-          this.arrow();
+          this.arrow()
           break;
       }
     },
     move(direction: Direction){
       console.log('move direction action')
-      this.gameHandler.move(direction);
+      this.gameHandler.move(direction)
     },
     go() {
       console.log('move player action')
-      let result = this.gameHandler.go();
+      let result = this.gameHandler.go()
+      if (result != 'safe') {
+        this.alertMessage.text = result
+        this.alertMessage.visible = true
+      }
       console.log('result movement:', result)
     },
     get() {
       console.log('get gold action')
-      this.gameHandler.getGold();
+      this.gameHandler.getGold()
     },
     arrow() {
       console.log('arrow shoot action')
-      this.gameHandler.playerShootsArrow();
+      this.gameHandler.playerShootsArrow()
     },
     newGame() {
-      this.gameHandler.newGame();
+      this.gameHandler.newGame()
+      this.alertMessage.visible = false
     },
     myGames() {
+      this.alertMessage.visible = false
     },
     show() {
-      this.showStatus = true;
+      this.showStatus = true
     },
     hide() {
-      this.showStatus = false;
+      this.showStatus = false
     },
     play() {},
     stop() {},
@@ -160,5 +173,15 @@ export default defineComponent({
   justify-content: space-between;
   width: 100%;
   margin-top: 20px;
+}
+.label-alert {
+  display: flex;
+  flex-direction: column;
+  color: red;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 1px 1px 2px black;
+  z-index: 3;
 }
 </style>

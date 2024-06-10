@@ -5,7 +5,7 @@
         <button @click="$emit('go')">Go</button>
         <button @click="$emit('get')">Get</button>
         <button @click="$emit('arrow')">Arrow</button>
-        <label v-show="wumpusScreem" class="label">screamed</label>
+        <label v-show="wumpusScreem" class="label-scream">screamed</label>
       </div>
     </div>
   </div>
@@ -41,7 +41,7 @@ export default {
   gap: 10px;
 }
 
-.label {
+.label-scream {
   display: flex;
   flex-direction: column;
   color: white;
