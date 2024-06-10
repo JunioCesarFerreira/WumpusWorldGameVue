@@ -26,7 +26,11 @@ import transparent_block_img from '@/assets/images/transparent_block.png'
 import brown_block_img from '@/assets/images/brown_block.png'
 import { Direction } from '@/types/enums/Direction'
 import { Game } from '@/types/Game';
-import { Position, Cell, arePositionsEqual, isPositionInArray, getAdjacentCells } from '@/types/Position'
+import { Position, arePositionsEqual, isPositionInArray, getAdjacentCells } from '@/types/Position'
+
+interface Cell {
+  id: Position;
+}
 
 export default defineComponent({
   props: {
