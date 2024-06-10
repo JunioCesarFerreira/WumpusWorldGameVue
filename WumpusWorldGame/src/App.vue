@@ -22,6 +22,7 @@
           @go="go" 
           @get="get" 
           @arrow="arrow"
+          :wumpusScreem="game.wumpusIsDead"
         />
       </div>
     </div>
@@ -106,7 +107,8 @@ export default defineComponent({
     },
     go() {
       console.log('move player action')
-      this.gameHandler.go();
+      let result = this.gameHandler.go();
+      console.log('result movement:', result)
     },
     get() {
       console.log('get gold action')
