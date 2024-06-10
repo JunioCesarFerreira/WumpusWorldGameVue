@@ -1,5 +1,9 @@
 export type Position = [number, number];
 
+interface Cell {
+  id: Position;
+}
+
 export function arePositionsEqual(pos1: Position, pos2: Position): boolean {
     return pos1[0] === pos2[0] && pos1[1] === pos2[1];
 }

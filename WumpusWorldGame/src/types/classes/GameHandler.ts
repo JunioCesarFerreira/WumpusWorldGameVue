@@ -17,14 +17,14 @@ export class GameHandler {
   newGame(): void {
     const positions: Position[] = [];
     const restrictions: Position[] = [
-      [1, 1],
-      [1, 2],
-      [2, 1]
+      [0, 0],
+      [0, 1],
+      [1, 0]
     ];
 
     while (positions.length < 5) {
-      const x = Math.floor(Math.random() * this.dimX + 1);
-      const y = Math.floor(Math.random() * this.dimY + 1);
+      const x = Math.floor(Math.random() * this.dimX);
+      const y = Math.floor(Math.random() * this.dimY);
 
       const p: Position = [x, y];
 
@@ -36,11 +36,11 @@ export class GameHandler {
     this.game.goldPosition = positions[0];
     this.game.pitsPositions = positions.slice(1, 4);
     this.game.wumpusPosition = positions[4];
-    this.game.player.position = [1,1]
+    this.game.player.position = [0,0]
     this.game.player.direction = Direction.Down;
     this.game.player.arrow = true;
     this.game.player.gold = false;
-    this.game.visitedCells = [[1,1]];
+    this.game.visitedCells = [[0,0]];
     this.game.wumpusIsDead = false;
     this.game.score = 0;
     console.log(JSON.stringify(this.game))
@@ -57,25 +57,25 @@ export class GameHandler {
   go(): string {
     switch(this.game.player.direction){
       case Direction.Up:
-        if (this.game.player.position[1] + 1 <= this.dimY) {
+        if (this.game.player.position[1] + 1 < this.dimY) {
           this.game.player.position[1]++;
           this.updateScore(-1)
         }
         break;
       case Direction.Down:
-        if (this.game.player.position[1] - 1 > 0) {
+        if (this.game.player.position[1] - 1 >= 0) {
           this.game.player.position[1]--;
           this.updateScore(-1)
         }
         break;
       case Direction.Left:
-        if (this.game.player.position[0] - 1 > 0) {
+        if (this.game.player.position[0] - 1 >= 0) {
           this.game.player.position[0]--;
           this.updateScore(-1)
         }
         break;
       case Direction.Right:
-        if (this.game.player.position[0] + 1 <= this.dimX) {
+        if (this.game.player.position[0] + 1 < this.dimX) {
           this.game.player.position[0]++;
           this.updateScore(-1)
         }

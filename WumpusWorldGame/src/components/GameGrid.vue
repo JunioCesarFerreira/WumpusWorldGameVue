@@ -26,11 +26,7 @@ import transparent_block_img from '@/assets/images/transparent_block.png'
 import brown_block_img from '@/assets/images/brown_block.png'
 import { Direction } from '@/types/enums/Direction'
 import { Game } from '@/types/Game';
-import { Position, arePositionsEqual, isPositionInArray, getAdjacentCells } from '@/types/Position'
-
-interface Cell {
-  id: Position;
-}
+import { Position, Cell, arePositionsEqual, isPositionInArray, getAdjacentCells } from '@/types/Position'
 
 export default defineComponent({
   props: {
@@ -47,10 +43,10 @@ export default defineComponent({
   data() {
     return {
       grid: [
-        [{ id: [1, 4] }, { id: [2, 4] }, { id: [3, 4] }, { id: [4, 4] }],
-        [{ id: [1, 3] }, { id: [2, 3] }, { id: [3, 3] }, { id: [4, 3] }],
-        [{ id: [1, 2] }, { id: [2, 2] }, { id: [3, 2] }, { id: [4, 2] }],
-        [{ id: [1, 1] }, { id: [2, 1] }, { id: [3, 1] }, { id: [4, 1] }],
+        [{ id: [0, 3] }, { id: [1, 3] }, { id: [2, 3] }, { id: [3, 3] }],
+        [{ id: [0, 2] }, { id: [1, 2] }, { id: [2, 2] }, { id: [3, 2] }],
+        [{ id: [0, 1] }, { id: [1, 1] }, { id: [2, 1] }, { id: [3, 1] }],
+        [{ id: [0, 0] }, { id: [1, 0] }, { id: [2, 0] }, { id: [3, 0] }],
       ] as Cell[][],
       visitedCells: [[1, 1]] as Position[] // Lista para armazenar as células visitadas
     };

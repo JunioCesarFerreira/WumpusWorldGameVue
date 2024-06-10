@@ -18,7 +18,10 @@
       </div>
       <div class="info-panel">
         <ControlPanelDirection @move="move" />
-        <ProbabilitiesTable />
+        <ProbabilitiesTable 
+          :wumpusProbDist="wumpusProbDist"
+          :pitsProbDist="pitsProbDist"
+        />
         <ControlPanelActions 
           @go="go" 
           @get="get" 
@@ -41,6 +44,7 @@ import { Direction } from '@/types/enums/Direction';
 import { Position } from './types/Position';
 import { Game } from '@/types/Game';
 import { GameHandler} from '@/types/classes/GameHandler'
+import { HazardProbabilityDistribution} from '@/types/classes/HazardProbabilityDistribution'
 
 interface AlertMessage{
   visible: boolean,
@@ -59,26 +63,33 @@ export default defineComponent({
   data() {
     return {
       dimension: 4 as Number, // Dimensão do tabuleiro quadrado
+
       game: {
         score: 0,
-        wumpusPosition: [2, 3] as Position,
+        wumpusPosition: [1, 2] as Position,
         wumpusIsDead: false,
         pitsPositions: [
-          [1, 4],
-          [3, 1],
-          [4, 3]
+          [0, 3],
+          [2, 0],
+          [3, 2]
         ] as Position[],
-        goldPosition: [4, 4] as Position,
+        goldPosition: [3, 3] as Position,
         player: {
-          position: [1,1] as Position,
+          position: [0, 0] as Position,
           direction: Direction.Down,
           arrow: true
         },
         visitedCells: [] as Position[]
       } as Game,
+      
       showStatus: false as Boolean,
       gameHandler: null as GameHandler | null,
-      alertMessage: { visible: false, text: "" } as AlertMessage
+
+      alertMessage: { visible: false, text: "" } as AlertMessage,
+
+      hazerdProbDistribution: null as HazardProbabilityDistribution | null,
+      wumpusProbDist: [] as number[][],
+      pitsProbDist: [] as number[][]
     };
   },
   methods: {
@@ -120,6 +131,8 @@ export default defineComponent({
         this.alertMessage.visible = true
       }
       console.log('result movement:', result)
+      this.wumpusProbDist = this.hazerdProbDistribution.calculateWumpusProbabilities()
+      this.pitsProbDist = this.hazerdProbDistribution.calculatePitsProbabilities()
     },
     get() {
       console.log('get gold action')
@@ -149,6 +162,9 @@ export default defineComponent({
   mounted() {
     window.addEventListener('keydown', this.handleKeydown);
     this.gameHandler = new GameHandler(this.game);
+    this.hazerdProbDistribution = new HazardProbabilityDistribution(this.game, this.dimension)
+    this.wumpusProbDist = this.hazerdProbDistribution.calculateWumpusProbabilities()
+    this.pitsProbDist = this.hazerdProbDistribution.calculatePitsProbabilities()
   },
   beforeUnmount() {
     window.removeEventListener('keydown', this.handleKeydown);
