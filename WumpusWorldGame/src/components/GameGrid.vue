@@ -107,18 +107,6 @@ export default defineComponent({
       }
       return ""
     }
-  },
-  watch: {
-    gameProps: {
-      handler(newValue: Game) {
-        // Atualiza a lista de células visitadas quando a posição do jogador mudar
-        if (!isPositionInArray(newValue.player.position, this.gameProps.visitedCells)) {
-          const pos = { ...newValue.player.position } as Position;
-          this.gameProps.visitedCells.push(pos);
-        }
-      },
-      deep: true
-    }
   }
 });
 </script>

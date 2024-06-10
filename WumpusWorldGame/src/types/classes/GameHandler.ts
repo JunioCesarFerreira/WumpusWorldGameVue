@@ -46,10 +46,9 @@ export class GameHandler {
     console.log(JSON.stringify(this.game))
   }
 
-  updateScore(value: number) {
+  private updateScore(value: number) {
     this.game.score += value;
   }
-
   
   move(direction: Direction) {
     this.game.player.direction = direction;
@@ -81,6 +80,10 @@ export class GameHandler {
           this.updateScore(-1)
         }
         break;
+    }    
+    if (!isPositionInArray(this.game.player.position, this.game.visitedCells)) {
+      const pos = { ...this.game.player.position } as Position;
+      this.game.visitedCells.push(pos);
     }
     if (this.isPit(this.game.player.position)) {
       this.updateScore(-1000);
@@ -109,7 +112,6 @@ export class GameHandler {
   }
 
   playerShootsArrow(): void {
-    console.log(JSON.stringify(this.game));
     const [playerX, playerY] = this.game.player.position;
     const [wumpusX, wumpusY] = this.game.wumpusPosition;
     if (this.game.player.arrow) {
@@ -138,6 +140,5 @@ export class GameHandler {
         break;
       }
     }
-    console.log(JSON.stringify(this.game));
   }
 }
