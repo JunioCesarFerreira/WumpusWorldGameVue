@@ -1,6 +1,6 @@
-import { Position, arePositionsEqual, isPositionInArray } from '../Position';
-import { Game } from '../Game';
-import { Direction } from '../enums/Direction';
+import { Position, arePositionsEqual, isPositionInArray } from '@/types/Position';
+import { Game } from '@/types/Game';
+import { Direction } from '@/types/enums/Direction';
 
 export class GameHandler {
   private dimX: number;

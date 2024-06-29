@@ -1,5 +1,5 @@
-import { Position, arePositionsEqual, isPositionInArray, getAdjacentCells } from '../Position';
-import { Game } from '../Game';
+import { Position, arePositionsEqual, isPositionInArray, getAdjacentCells } from '@/types/Position';
+import { Game } from '@/types/Game';
 
 export enum HazardType {
     Wumpus, Pit

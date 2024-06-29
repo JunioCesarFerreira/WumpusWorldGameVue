@@ -13,7 +13,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style>
-/* Você pode adicionar estilo global aqui, se necessário */
-</style>

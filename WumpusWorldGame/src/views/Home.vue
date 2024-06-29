@@ -43,8 +43,9 @@ import ProbabilitiesTable from '@/components/ProbabilitiesTable.vue';
 import { Direction } from '@/types/enums/Direction';
 import { Position } from '@/types/Position';
 import { Game } from '@/types/Game';
-import { GameHandler} from '@/types/classes/GameHandler'
-import { HazardProbabilityDistribution} from '@/types/classes/HazardProbabilityDistribution'
+import { GameHandler} from '@/classes/GameHandler'
+import { HazardProbabilityDistribution} from '@/classes/HazardProbabilityDistribution'
+import { FavoriteGamesHandler } from '@/classes/FavoriteGamesHandler';
 
 interface AlertMessage{
   visible: boolean,
@@ -84,6 +85,7 @@ export default defineComponent({
       
       showStatus: false as boolean,
       gameHandler: null as GameHandler | null,
+      favoriteGames: null as FavoriteGamesHandler | null,
 
       alertMessage: { visible: false, text: "" } as AlertMessage,
 
@@ -147,6 +149,7 @@ export default defineComponent({
       this.alertMessage.visible = false
     },
     myGames() {
+      this.favoriteGames.next();
       this.alertMessage.visible = false
     },
     show() {
@@ -162,6 +165,7 @@ export default defineComponent({
   mounted() {
     window.addEventListener('keydown', this.handleKeydown);
     this.gameHandler = new GameHandler(this.game);
+    this.favoriteGames = new FavoriteGamesHandler(this.game);
     this.hazerdProbDistribution = new HazardProbabilityDistribution(this.game, this.dimension)
     this.wumpusProbDist = this.hazerdProbDistribution.calculateWumpusProbabilities()
     this.pitsProbDist = this.hazerdProbDistribution.calculatePitsProbabilities()
@@ -200,4 +204,4 @@ export default defineComponent({
   text-shadow: 1px 1px 2px black;
   z-index: 3;
 }
-</style>
+</style>@/classes/GameHandler@/classes/HazardProbabilityDistribution
