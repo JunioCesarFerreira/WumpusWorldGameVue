@@ -65,6 +65,7 @@ button {
   margin: 5px;
 }
 .score {
+  margin-left: 10px;
   font-weight: bold;
 }
 </style>

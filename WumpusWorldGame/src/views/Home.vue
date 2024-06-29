@@ -1,61 +1,203 @@
 <template>
   <div class="home">
-    <Header />
+    <HeaderPanel 
+      @newGame="newGame"
+      @myGames="myGames"
+      @show="show" @hide="hide"
+      @play="play" @stop="stop"
+      @step="step"
+      :score="game.score"
+    />
     <div class="game-container">
       <div class="grid-section">
-        <GameGrid />
+        <GameGrid 
+          :gameProps="game" 
+          :showProps="showStatus"
+        />
+        <label v-show="alertMessage.visible" class="label-alert">{{ alertMessage.text }}</label>
       </div>
       <div class="info-panel">
-        <InfoPanel />
-      </div>
-      <div class="control-info-section">
-        <ControlPanel />
+        <ControlPanelDirection @move="move" />
+        <ProbabilitiesTable 
+          :wumpusProbDist="wumpusProbDist"
+          :pitsProbDist="pitsProbDist"
+        />
+        <ControlPanelActions 
+          @go="go" 
+          @get="get" 
+          @arrow="arrow"
+          :wumpusScreem="game.wumpusIsDead"
+        />
       </div>
     </div>
   </div>
 </template>
-  
-  <script>
-  import Header from '@/components/Header.vue';
-  import GameGrid from '@/components/GameGrid.vue';
-  import ControlPanel from '@/components/ControlPanel.vue';
-  import InfoPanel from '@/components/InfoPanel.vue';
-  
-  export default {
-    name: 'Home',
-    components: {
-      Header,
-      GameGrid,
-      ControlPanel,
-      InfoPanel,
+
+<script lang="ts">
+import { defineComponent } from 'vue';
+import HeaderPanel from '@/components/HeaderPanel.vue';
+import GameGrid from '@/components/GameGrid.vue';
+import ControlPanelDirection from '@/components/ControlPanelDirection.vue';
+import ControlPanelActions from '@/components/ControlPanelActions.vue';
+import ProbabilitiesTable from '@/components/ProbabilitiesTable.vue';
+import { Direction } from '@/types/enums/Direction';
+import { Position } from '@/types/Position';
+import { Game } from '@/types/Game';
+import { GameHandler} from '@/types/classes/GameHandler'
+import { HazardProbabilityDistribution} from '@/types/classes/HazardProbabilityDistribution'
+
+interface AlertMessage{
+  visible: boolean,
+  text: string
+}
+
+export default defineComponent({
+  name: 'App',
+  components: {
+    HeaderPanel,
+    GameGrid,
+    ControlPanelDirection,
+    ProbabilitiesTable,
+    ControlPanelActions,
+  },
+  data() {
+    return {
+      dimension: 4 as Number, // Dimensão do tabuleiro quadrado
+
+      game: {
+        score: 0,
+        wumpusPosition: [1, 2] as Position,
+        wumpusIsDead: false,
+        pitsPositions: [
+          [0, 3],
+          [2, 0],
+          [3, 2]
+        ] as Position[],
+        goldPosition: [3, 3] as Position,
+        player: {
+          position: [0, 0] as Position,
+          direction: Direction.Down,
+          arrow: true
+        },
+        visitedCells: [] as Position[]
+      } as Game,
+      
+      showStatus: false as boolean,
+      gameHandler: null as GameHandler | null,
+
+      alertMessage: { visible: false, text: "" } as AlertMessage,
+
+      hazerdProbDistribution: null as HazardProbabilityDistribution | null,
+      wumpusProbDist: [] as number[][],
+      pitsProbDist: [] as number[][]
+    };
+  },
+  methods: {
+    handleKeydown(event: KeyboardEvent) {
+      switch(event.key) {
+        case 'ArrowUp':
+          this.move(Direction.Up)
+          break;
+        case 'ArrowDown':
+          this.move(Direction.Down)
+          break;
+        case 'ArrowLeft':
+          this.move(Direction.Left)
+          break;
+        case 'ArrowRight':
+          this.move(Direction.Right)
+          break;
+        case 'Enter':
+          this.go()
+          break;
+        case ' ':
+          this.get()
+          break;
+        case 'A':
+        case 'a':
+          this.arrow()
+          break;
+      }
     },
-  };
-  </script>
-  
-  <style>
-  .home {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .game-container {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    margin-top: 20px;
-  }
-  
-  .grid-section {
-    flex: 2;
-  }
-  
-  .control-info-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-  }
-  </style>
-  
+    move(direction: Direction){
+      console.log('move direction action')
+      this.gameHandler.move(direction)
+    },
+    go() {
+      console.log('move player action')
+      let result = this.gameHandler.go()
+      if (result != 'safe') {
+        this.alertMessage.text = result
+        this.alertMessage.visible = true
+      }
+      console.log('result movement:', result)
+      this.wumpusProbDist = this.hazerdProbDistribution.calculateWumpusProbabilities()
+      this.pitsProbDist = this.hazerdProbDistribution.calculatePitsProbabilities()
+    },
+    get() {
+      console.log('get gold action')
+      this.gameHandler.getGold()
+    },
+    arrow() {
+      console.log('arrow shoot action')
+      this.gameHandler.playerShootsArrow()
+    },
+    newGame() {
+      this.gameHandler.newGame()
+      this.alertMessage.visible = false
+    },
+    myGames() {
+      this.alertMessage.visible = false
+    },
+    show() {
+      this.showStatus = true
+    },
+    hide() {
+      this.showStatus = false
+    },
+    play() {},
+    stop() {},
+    step() {}
+  },
+  mounted() {
+    window.addEventListener('keydown', this.handleKeydown);
+    this.gameHandler = new GameHandler(this.game);
+    this.hazerdProbDistribution = new HazardProbabilityDistribution(this.game, this.dimension)
+    this.wumpusProbDist = this.hazerdProbDistribution.calculateWumpusProbabilities()
+    this.pitsProbDist = this.hazerdProbDistribution.calculatePitsProbabilities()
+  },
+  beforeUnmount() {
+    window.removeEventListener('keydown', this.handleKeydown);
+  },
+});
+</script>
+
+<style>
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.info-panel {
+  display: flex;
+  flex-direction: row;
+}
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 20px;
+}
+.label-alert {
+  display: flex;
+  flex-direction: column;
+  color: red;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 1px 1px 2px black;
+  z-index: 3;
+}
+</style>
