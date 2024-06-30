@@ -40,12 +40,15 @@ import GameGrid from '@/components/GameGrid.vue';
 import ControlPanelDirection from '@/components/ControlPanelDirection.vue';
 import ControlPanelActions from '@/components/ControlPanelActions.vue';
 import ProbabilitiesTable from '@/components/ProbabilitiesTable.vue';
+
 import { Direction } from '@/types/enums/Direction';
 import { Position } from '@/types/Position';
 import { Game } from '@/types/Game';
+
 import { GameHandler} from '@/classes/GameHandler'
 import { HazardProbabilityDistribution} from '@/classes/HazardProbabilityDistribution'
 import { FavoriteGamesHandler } from '@/classes/FavoriteGamesHandler';
+import { SmartAgent } from '@/classes/SmartAgent';
 
 interface AlertMessage{
   visible: boolean,
@@ -84,12 +87,14 @@ export default defineComponent({
       } as Game,
       
       showStatus: false as boolean,
-      gameHandler: null as GameHandler | null,
-      favoriteGames: null as FavoriteGamesHandler | null,
 
       alertMessage: { visible: false, text: "" } as AlertMessage,
 
+      gameHandler: null as GameHandler | null,
+      favoriteGames: null as FavoriteGamesHandler | null,
       hazerdProbDistribution: null as HazardProbabilityDistribution | null,
+      smartAgent: null as SmartAgent | null,
+
       wumpusProbDist: [] as number[][],
       pitsProbDist: [] as number[][]
     };
@@ -147,10 +152,12 @@ export default defineComponent({
     newGame() {
       this.gameHandler.newGame()
       this.alertMessage.visible = false
+      this.updatePrababilities()
     },
     myGames() {
       this.favoriteGames.next();
       this.alertMessage.visible = false
+      this.updatePrababilities()
     },
     show() {
       this.showStatus = true
@@ -160,18 +167,25 @@ export default defineComponent({
     },
     play() {},
     stop() {},
-    step() {}
+    step() {
+      this.smartAgent.step()
+      this.updatePrababilities()
+    },
+    updatePrababilities(){
+      this.wumpusProbDist = this.hazerdProbDistribution.calculateWumpusProbabilities()
+      this.pitsProbDist = this.hazerdProbDistribution.calculatePitsProbabilities()
+    }
   },
   mounted() {
-    window.addEventListener('keydown', this.handleKeydown);
-    this.gameHandler = new GameHandler(this.game);
-    this.favoriteGames = new FavoriteGamesHandler(this.game);
+    window.addEventListener('keydown', this.handleKeydown)
+    this.gameHandler = new GameHandler(this.game)
+    this.favoriteGames = new FavoriteGamesHandler(this.game)
     this.hazerdProbDistribution = new HazardProbabilityDistribution(this.game, this.dimension)
-    this.wumpusProbDist = this.hazerdProbDistribution.calculateWumpusProbabilities()
-    this.pitsProbDist = this.hazerdProbDistribution.calculatePitsProbabilities()
+    this.smartAgent = new SmartAgent(this.game, this.gameHandler, this.hazerdProbDistribution)
+    this.updatePrababilities()
   },
   beforeUnmount() {
-    window.removeEventListener('keydown', this.handleKeydown);
+    window.removeEventListener('keydown', this.handleKeydown)
   },
 });
 </script>

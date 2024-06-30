@@ -14,7 +14,7 @@ export class HazardProbabilityDistribution {
         this.dimension = dimension;
     }
 
-    onlyTest():number[][]{
+    zeroMatrix():number[][]{
         const probDist = Array.from({ length: this.dimension }, () => Array(this.dimension).fill(0));
         return probDist;
     }

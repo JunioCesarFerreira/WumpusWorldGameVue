@@ -14,8 +14,8 @@ export function getAdjacentCells(positions: Position[], dim: number): Position[]
   positions.forEach(([x, y]) => {
     if (x > 0) adj.add(JSON.stringify([x - 1, y]));
     if (y > 0) adj.add(JSON.stringify([x, y - 1]));
-    if (x < dim) adj.add(JSON.stringify([x + 1, y]));
-    if (y < dim) adj.add(JSON.stringify([x, y + 1]));
+    if (x < dim-1) adj.add(JSON.stringify([x + 1, y]));
+    if (y < dim-1) adj.add(JSON.stringify([x, y + 1]));
   });
 
   return Array.from(adj).map((pos) => JSON.parse(pos) as Position);
