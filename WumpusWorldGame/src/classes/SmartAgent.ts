@@ -14,6 +14,8 @@ export enum WumpusHuntState {
 
 const DIMENSION: number = 4;
 
+type FinishCallback = (message: string) => void;
+
 export class SmartAgent {
     private player: Game["player"];
     private game: Game;
@@ -26,15 +28,18 @@ export class SmartAgent {
     private huntingWumpus: WumpusHuntState = WumpusHuntState.None;
     private wumpusPosition: Position | null = null;
     private possibleWumpusPositions: Position[] = [];
+    private targetToShoot: Position;
+    private finishCallback: FinishCallback;
 
-    constructor(game: Game, gameHandler: GameHandler, hazardProbDist: HazardProbabilityDistribution) {
+    constructor(game: Game, gameHandler: GameHandler, hazardProbDist: HazardProbabilityDistribution, finishCallback: FinishCallback) {
         this.game = game;
         this.gameHandler = gameHandler;
         this.player = game.player;
         this.hazardProbDist = hazardProbDist;
         this.visited = Array.from({ length: DIMENSION }, () => Array(DIMENSION).fill(false));
+        this.finishCallback = finishCallback;
     }
-    
+
     public step(): boolean {
         let resultStep = true;
         this.visited[this.player.position[0]][this.player.position[1]] = true;
@@ -48,9 +53,13 @@ export class SmartAgent {
         } else {
             resultStep = this.exploreOrHuntWumpus();
         }
+
+        if (!resultStep) {
+            this.finishCallback("Process completed.");
+        }
+
         return resultStep;
     }
-    
 
     private exploreOrHuntWumpus(): boolean {
         const nextMove = this.findUnexploredSafeCell();
@@ -75,10 +84,9 @@ export class SmartAgent {
         }
         return true;
     }
-    
 
     private findUnexploredSafeCell(): Position | null {
-        const adj = getAdjacentCells([this.player.position], DIMENSION-1);
+        const adj = getAdjacentCells([this.player.position], DIMENSION - 1);
         console.log("adj", JSON.stringify(adj));
         for (const cell of adj) {
             if (this.isSafeAndUnvisited(cell)) return cell;
@@ -108,7 +116,6 @@ export class SmartAgent {
                 console.log("right");
                 this.gameHandler.move(Direction.Right);
             }
-
         } else if (current[0] === target[0]) {
             if (target[1] > current[1]) {
                 console.log("up");
@@ -119,11 +126,14 @@ export class SmartAgent {
             }
         }
     }
-    
 
     private updateProbDist() {
         if (this.game.wumpusIsDead) {
-            this.hazardProbDist.zeroMatrix();
+            this.wumpusProbDist = this.hazardProbDist.zeroMatrix();
+        } else if (this.wumpusPosition){
+            this.wumpusProbDist =this.hazardProbDist.zeroMatrix();
+            let p = this.wumpusPosition;
+            this.wumpusProbDist[p[0]][p[1]] = 1;
         } else {
             this.wumpusProbDist = this.hazardProbDist.calculateWumpusProbabilities();
         }
@@ -150,7 +160,7 @@ export class SmartAgent {
     }
 
     private isSafeAndUnvisited(cell: Position): boolean {
-        console.log(`isSafe: (${cell[0]},${cell[1]})`)
+        console.log(`isSafe: (${cell[0]},${cell[1]})`);
         return (this.wumpusProbDist[cell[0]][cell[1]] + this.pitsProbDist[cell[0]][cell[1]] === 0
             || (this.wumpusPosition && arePositionsEqual(cell, this.wumpusPosition) && this.game.wumpusIsDead))
             && !this.visited[cell[0]][cell[1]];
@@ -209,7 +219,8 @@ export class SmartAgent {
             this.redirect(this.player.position, this.wumpusPosition);
         } else if (this.possibleWumpusPositions.length === 2) {
             let targetIndex = Math.floor(Math.random() * 2);
-            this.redirect(this.player.position, this.possibleWumpusPositions[targetIndex]);
+            this.targetToShoot = this.possibleWumpusPositions[targetIndex];
+            this.redirect(this.player.position, this.targetToShoot);
         } else return false;
         return true;
     }
@@ -238,7 +249,10 @@ export class SmartAgent {
                 this.huntingWumpus = WumpusHuntState.Finished;
                 if (this.possibleWumpusPositions.length === 2) {
                     if (this.game.wumpusIsDead) {
+                        this.wumpusPosition = this.targetToShoot;
                     } else {
+                        this.wumpusPosition = this.possibleWumpusPositions
+                                                .find((t) => {!arePositionsEqual(t, this.targetToShoot)});
                     }
                 }
                 break;

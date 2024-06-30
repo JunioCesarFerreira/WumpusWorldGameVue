@@ -15,6 +15,7 @@
           :showProps="showStatus"
         />
         <label v-show="alertMessage.visible" class="label-alert">{{ alertMessage.text }}</label>
+        <label v-show="infoMessage.visible" class="label-info">{{ infoMessage.text }}</label>
       </div>
       <div class="info-panel">
         <ControlPanelDirection @move="move" />
@@ -89,6 +90,7 @@ export default defineComponent({
       showStatus: false as boolean,
 
       alertMessage: { visible: false, text: "" } as AlertMessage,
+      infoMessage: { visible: false, text: "" } as AlertMessage,
 
       gameHandler: null as GameHandler | null,
       favoriteGames: null as FavoriteGamesHandler | null,
@@ -96,7 +98,9 @@ export default defineComponent({
       smartAgent: null as SmartAgent | null,
 
       wumpusProbDist: [] as number[][],
-      pitsProbDist: [] as number[][]
+      pitsProbDist: [] as number[][],
+
+      timer: null as number | null
     };
   },
   methods: {
@@ -152,11 +156,15 @@ export default defineComponent({
     newGame() {
       this.gameHandler.newGame()
       this.alertMessage.visible = false
+      this.infoMessage.visible = false
+      this.instance()
       this.updatePrababilities()
     },
     myGames() {
       this.favoriteGames.next();
       this.alertMessage.visible = false
+      this.infoMessage.visible = false
+      this.instance()
       this.updatePrababilities()
     },
     show() {
@@ -165,8 +173,20 @@ export default defineComponent({
     hide() {
       this.showStatus = false
     },
-    play() {},
-    stop() {},
+    play() {
+      if (!this.timer) {
+        this.timer = window.setInterval(() => {
+          this.step();
+        }, 500);
+      }
+    },
+    stop() {
+      if (this.timer) {
+        clearInterval(this.timer);
+        this.timer = null;
+      }
+      this.infoMessage.visible = false
+    },
     step() {
       this.smartAgent.step()
       this.updatePrababilities()
@@ -174,14 +194,27 @@ export default defineComponent({
     updatePrababilities(){
       this.wumpusProbDist = this.hazerdProbDistribution.calculateWumpusProbabilities()
       this.pitsProbDist = this.hazerdProbDistribution.calculatePitsProbabilities()
+    },
+    finishCallback(message: string) {
+      this.infoMessage.text = message;
+      this.infoMessage.visible = true;
+      this.stop();
+    },
+    instance(){
+      this.hazerdProbDistribution = new HazardProbabilityDistribution(this.game, this.dimension)
+      this.smartAgent = new SmartAgent(
+                            this.game, 
+                            this.gameHandler, 
+                            this.hazerdProbDistribution, 
+                            this.finishCallback
+                          )
     }
   },
   mounted() {
     window.addEventListener('keydown', this.handleKeydown)
     this.gameHandler = new GameHandler(this.game)
     this.favoriteGames = new FavoriteGamesHandler(this.game)
-    this.hazerdProbDistribution = new HazardProbabilityDistribution(this.game, this.dimension)
-    this.smartAgent = new SmartAgent(this.game, this.gameHandler, this.hazerdProbDistribution)
+    this.instance()
     this.updatePrababilities()
   },
   beforeUnmount() {
@@ -218,4 +251,14 @@ export default defineComponent({
   text-shadow: 1px 1px 2px black;
   z-index: 3;
 }
-</style>@/classes/GameHandler@/classes/HazardProbabilityDistribution
+.label-info {
+  display: flex;
+  flex-direction: column;
+  color: green;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 1px 1px 2px black;
+  z-index: 3;
+}
+</style>
