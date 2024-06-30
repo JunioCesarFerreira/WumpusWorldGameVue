@@ -183,6 +183,8 @@ The Wumpus hunting algorithm uses a state machine to manage the different stages
 ### Final Considerations
 The intelligent agent combines rule-based and probabilistic exploration with a Wumpus hunting strategy to maximize its chances of success while minimizing the risk of death. The modular structure of the code allows for the extension and refinement of the agent's functionalities.
 
+![img](print.gif)
+
 ---
 
 ## Future Improvements and Experimentations

@@ -184,6 +184,8 @@ O algoritmo de caça ao Wumpus utiliza uma máquina de estados para gerenciar as
 ### Considerações Finais
 O agente inteligente combina a exploração baseada em regras e probabilidades com uma estratégia de caça ao Wumpus para maximizar suas chances de sucesso enquanto minimiza o risco de morte. A estrutura modular do código permite a extensão e refinamento das funcionalidades do agente.
 
+![img](print.gif)
+
 ---
 
 ## Futuras Melhorias e Experimentações
