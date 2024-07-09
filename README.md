@@ -91,6 +91,8 @@ Um dos motivos do desenvolvimento deste projeto foi a vontade de implementar um 
 
 ![img](print.png)
 
+#### [Teste online.](https://juniocesarferreira.github.io/WumpusWorldGameVue/).
+
 ---
 
 ## Sobre as Distribuições de Probabilidades

@@ -217,11 +217,11 @@ export default defineComponent({
       }
   },
   mounted() {
-    window.addEventListener('keydown', this.handleKeydown)
     this.gameHandler = new GameHandler(this.game)
     this.favoriteGames = new FavoriteGamesHandler(this.game)
     this.instance()
     this.updatePrababilities()
+    window.addEventListener('keydown', this.handleKeydown)
   },
   beforeUnmount() {
     window.removeEventListener('keydown', this.handleKeydown)

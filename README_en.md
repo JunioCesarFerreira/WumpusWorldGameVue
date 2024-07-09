@@ -185,6 +185,8 @@ The intelligent agent combines rule-based and probabilistic exploration with a W
 
 ![img](print.gif)
 
+#### [Online test.](https://juniocesarferreira.github.io/WumpusWorldGameVue/)
+
 ---
 
 ## Future Improvements and Experimentations
