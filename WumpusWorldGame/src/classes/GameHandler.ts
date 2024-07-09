@@ -3,13 +3,11 @@ import { Game } from '@/types/Game';
 import { Direction } from '@/types/enums/Direction';
 
 export class GameHandler {
-  private dimX: number;
-  private dimY: number;
+  private dimX: number = 4;
+  private dimY: number = 4;
   private game: Game;
 
   constructor(game: Game) {
-    this.dimX = 4;
-    this.dimY = 4;
     this.game = game;
     this.game.visitedCells.push({...game.player.position});
   }

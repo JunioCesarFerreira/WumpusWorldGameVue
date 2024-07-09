@@ -67,8 +67,6 @@ export default defineComponent({
   },
   data() {
     return {
-      dimension: 4 as Number, // Dimensão do tabuleiro quadrado
-
       game: {
         score: 0,
         wumpusPosition: [1, 2] as Position,
@@ -132,36 +130,40 @@ export default defineComponent({
     },
     move(direction: Direction){
       console.log('move direction action')
-      this.gameHandler.move(direction)
+      this.gameHandler?.move(direction)
     },
     go() {
       console.log('move player action')
-      let result = this.gameHandler.go()
-      if (result != 'safe') {
-        this.alertMessage.text = result
-        this.alertMessage.visible = true
+      if (this.gameHandler){
+        let result = this.gameHandler.go()
+        if (result != 'safe') {
+          this.alertMessage.text = result
+          this.alertMessage.visible = true
+        }
+        console.log('result movement:', result)
       }
-      console.log('result movement:', result)
-      this.wumpusProbDist = this.hazerdProbDistribution.calculateWumpusProbabilities()
-      this.pitsProbDist = this.hazerdProbDistribution.calculatePitsProbabilities()
+      if (this.hazerdProbDistribution) {
+        this.wumpusProbDist = this.hazerdProbDistribution.calculateWumpusProbabilities()
+        this.pitsProbDist = this.hazerdProbDistribution.calculatePitsProbabilities()
+      }
     },
     get() {
       console.log('get gold action')
-      this.gameHandler.getGold()
+      this.gameHandler?.getGold()
     },
     arrow() {
       console.log('arrow shoot action')
-      this.gameHandler.playerShootsArrow()
+      this.gameHandler?.playerShootsArrow()
     },
     newGame() {
-      this.gameHandler.newGame()
+      this.gameHandler?.newGame()
       this.alertMessage.visible = false
       this.infoMessage.visible = false
       this.instance()
       this.updatePrababilities()
     },
     myGames() {
-      this.favoriteGames.next();
+      this.favoriteGames?.next();
       this.alertMessage.visible = false
       this.infoMessage.visible = false
       this.instance()
@@ -184,31 +186,35 @@ export default defineComponent({
       if (this.timer) {
         clearInterval(this.timer);
         this.timer = null;
+      } else {
+        this.infoMessage.visible = false
       }
-      this.infoMessage.visible = false
     },
     step() {
-      this.smartAgent.step()
+      this.smartAgent?.step()
       this.updatePrababilities()
     },
     updatePrababilities(){
-      this.wumpusProbDist = this.hazerdProbDistribution.calculateWumpusProbabilities()
-      this.pitsProbDist = this.hazerdProbDistribution.calculatePitsProbabilities()
+      if (this.hazerdProbDistribution) {
+        this.wumpusProbDist = this.hazerdProbDistribution.calculateWumpusProbabilities()
+        this.pitsProbDist = this.hazerdProbDistribution.calculatePitsProbabilities()
+      }
     },
     finishCallback(message: string) {
+      console.log("finishCallback:", message);
       this.infoMessage.text = message;
       this.infoMessage.visible = true;
       this.stop();
     },
     instance(){
-      this.hazerdProbDistribution = new HazardProbabilityDistribution(this.game, this.dimension)
+      this.hazerdProbDistribution = new HazardProbabilityDistribution(this.game, 4)
       this.smartAgent = new SmartAgent(
                             this.game, 
                             this.gameHandler, 
                             this.hazerdProbDistribution, 
                             this.finishCallback
                           )
-    }
+      }
   },
   mounted() {
     window.addEventListener('keydown', this.handleKeydown)
