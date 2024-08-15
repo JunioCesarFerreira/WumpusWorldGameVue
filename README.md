@@ -1,6 +1,6 @@
 # Wumpus World
 
-🌍 *[Português](README.md) ∙ [English](README_en.md)*
+🌍 *[**Português**](README.md) ∙ [English](README_en.md)*
 
 Wumpus World é um jogo clássico que apresenta um problema lógico em inteligência artificial. O jogador navega por um mundo de grade, tentando evitar perigos como poços e o terrível Wumpus enquanto busca um tesouro de ouro. Este repositório apresenta uma implementação em Vue com TypeScript, utilizando Vite. A versão web está disponível para jogar [aqui](https://juniocesarferreira.github.io/WumpusWorldGameVue/).
 
